@@ -1,6 +1,7 @@
 package se.iths.martin.authserverprojekt2.controller;
 
 import jakarta.validation.Valid;
+import se.iths.martin.authserverprojekt2.dto.PasswordResetRequestDto;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import se.iths.martin.authserverprojekt2.dto.DeleteAccountRequestDto;
@@ -17,7 +18,7 @@ import se.iths.martin.authserverprojekt2.service.AppUserService;
 import java.util.List;
 
 /**
- * Exponerar API-anrop för att skapa och hämta användare.
+ * Exponerar registrering, användaruppgifter, kontoradering och demoåterställning av lösenord.
  */
 @RestController
 @RequestMapping("/appusers")
@@ -56,6 +57,19 @@ public class AppUserController {
     @ResponseStatus(HttpStatus.CREATED)
     public AppUserResponseDto create(@Valid @RequestBody RegistrationRequestDto request) {
         return appUserService.create(new AppUserRequestDto(request.username(), request.password()));
+    }
+
+    /**
+     * Återställer lösenordet i demoappen utan verifiering av kontots ägare.
+     * Den som känner till e-postadressen kan använda denna endpoint.
+     *
+     * @param request e-postadress och nytt lösenord
+     * @return HTTP 204 när det nya lösenordet har sparats
+     */
+    @PostMapping("/password-reset")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody PasswordResetRequestDto request) {
+        appUserService.resetPassword(request.username(), request.newPassword());
+        return ResponseEntity.noContent().build();
     }
 
     /**

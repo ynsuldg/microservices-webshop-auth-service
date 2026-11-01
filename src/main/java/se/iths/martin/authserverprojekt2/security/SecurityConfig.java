@@ -190,6 +190,8 @@ public class SecurityConfig {
     /**
      * Konfigurerar security regler för alla endpoints
      *
+     * Registrering och demoåterställning av lösenord tillåts utan inloggning.
+     *
      * @param httpSecurity som vi får av Spring Security
      * @return den konfigurerade SecurityFilterChain
      * @throws Exception om security konfigurationen inte kan byggas
@@ -201,7 +203,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/login", "/auth/jwks").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/appusers").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/appusers", "/appusers/password-reset").permitAll()
                         .requestMatchers(HttpMethod.GET, "/appusers/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
