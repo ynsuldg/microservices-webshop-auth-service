@@ -192,6 +192,8 @@ public class SecurityConfig {
      *
      * Registrering och demoåterställning av lösenord tillåts utan inloggning.
      *
+     * Rotadressens statussida tillåts också utan inloggning.
+     *
      * @param httpSecurity som vi får av Spring Security
      * @return den konfigurerade SecurityFilterChain
      * @throws Exception om security konfigurationen inte kan byggas
@@ -202,6 +204,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET, "/", "/index.html").permitAll()
                         .requestMatchers("/auth/login", "/auth/jwks").permitAll()
                         .requestMatchers(HttpMethod.POST, "/appusers", "/appusers/password-reset").permitAll()
                         .requestMatchers(HttpMethod.GET, "/appusers/**").permitAll()
