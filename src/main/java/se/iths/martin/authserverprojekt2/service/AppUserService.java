@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Hanterar användare och hashning av lösenord vid registrering.
+ * Hanterar användare samt hashning av lösenord vid registrering och demoåterställning.
  */
 @Service
 @RequiredArgsConstructor
@@ -79,6 +79,26 @@ public class AppUserService {
         appUser.setRole("USER");
         AppUser saved = appUserRepository.save(appUser);
         return appUserMapper.toDto(saved);
+    }
+
+    /**
+     * Sparar ett nytt hashat lösenord för ett befintligt demokonto utan ägarverifiering.
+     * Kontots identitet och roll behålls.
+     *
+     * @param username kontots e-postadress
+     * @param newPassword det nya lösenordet
+     * @throws ResponseStatusException om lösenordet är ogiltigt eller kontot saknas
+     */
+    @Transactional
+    public void resetPassword(String username, String newPassword) {
+        if (newPassword == null || newPassword.isBlank() || newPassword.length() < 8 ||
+                newPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid new password.");
+        }
+        var user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found."));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        appUserRepository.save(user);
     }
 
     /**
