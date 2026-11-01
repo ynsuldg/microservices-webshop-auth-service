@@ -63,6 +63,12 @@ Sätt miljövariablerna och starta från projektmappen.
 Kräver Java 17 eller senare och tillgång till databasen. Lokal adress: `http://localhost:8080`.
 Frontend startas i sitt repo med `npm install` och `npm run dev` och ansluter via gatewayn.
 
+## Statussida
+
+Rotadressen `/` visar tjänstens namn och **Service is running** med samma utseende som övriga backendtjänster.
+Sidan är publik och kontrollerar bara att denna tjänst svarar, inte övriga tjänster eller externa beroenden.
+API:ernas befintliga säkerhetsregler gäller fortfarande.
+
 ## Render
 
 | Tjänst | Render-adress |
@@ -80,7 +86,7 @@ Använd **Web Service → Existing Image**, sätt miljövariablerna i Render och
 Efter en ny image från senaste `main` väljs **Manual Deploy → Deploy latest reference**.
 En äldre Actions-omkörning kan skriva över samma tagg med äldre kod.
 
-Backendadressen är ett API, inte en vanlig webbsida. Rotadressen kan ge 401 eller 404 utan att tjänsten är nere.
+Backendadressen tillhör ett API. Rotadressen visar den publika statussidan.
 Render Free kan ge väntetid när tjänsterna väcks. Se [Render-dokumentationen](https://render.com/docs/deploying-an-image).
 
 Publika nycklar: [`/auth/jwks`](https://microservices-webshop-auth-service.onrender.com/auth/jwks).
