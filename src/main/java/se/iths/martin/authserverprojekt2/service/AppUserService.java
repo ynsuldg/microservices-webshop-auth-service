@@ -11,6 +11,9 @@ import se.iths.martin.authserverprojekt2.model.AppUser;
 import se.iths.martin.authserverprojekt2.repository.AppUserRepository;
 
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Hanterar användare och hashning av lösenord vid registrering.
@@ -58,10 +61,17 @@ public class AppUserService {
     /**
      * Skapar en användare med hashat lösenord och role är alltid satt till USER
      *
-     * @param appUserRequestDto username och password somn ny användare
+     * @param appUserRequestDto användarnamn och lösenord för en ny användare
      * @return sparad användare som en AppUserResponseDto
+     * @throws ResponseStatusException om användarnamnet redan finns eller lösenordet är för långt för BCrypt
      */
     public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
+        if (appUserRequestDto.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must not exceed 72 UTF-8 bytes.");
+        }
+        if (appUserRepository.findByUsername(appUserRequestDto.username()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already registered.");
+        }
         AppUser appUser = appUserMapper.toEntity(appUserRequestDto);
         String encodedPassword = passwordEncoder.encode(appUser.getPassword());
         appUser.setPassword(encodedPassword);
