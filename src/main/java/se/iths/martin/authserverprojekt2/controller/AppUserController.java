@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import se.iths.martin.authserverprojekt2.dto.AppUserRequestDto;
 import se.iths.martin.authserverprojekt2.dto.AppUserResponseDto;
+import se.iths.martin.authserverprojekt2.dto.RegistrationRequestDto;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import se.iths.martin.authserverprojekt2.service.AppUserService;
 
 import java.util.List;
@@ -40,14 +44,24 @@ public class AppUserController {
     }
 
     /**
-     * Skapar en användare
+     * Registrerar ett konto med validerad e-postadress och lösenord.
      *
-     * @param appUserRequestDto Kräver username och password
+     * @param request uppgifter för det nya kontot
      * @return Den skapade användarens id och användarnamn, utan lösenord
      */
-    @Valid
     @PostMapping
-    public AppUserResponseDto create(@RequestBody AppUserRequestDto appUserRequestDto) {
-        return appUserService.create(appUserRequestDto);
+    @ResponseStatus(HttpStatus.CREATED)
+    public AppUserResponseDto create(@Valid @RequestBody RegistrationRequestDto request) {
+        return appUserService.create(new AppUserRequestDto(request.username(), request.password()));
+    }
+
+    /**
+     * Returnerar konflikt även om två registreringar samtidigt använder samma användarnamn.
+     *
+     * @return HTTP 409 utan databasdetaljer
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> duplicateUsername() {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already registered.");
     }
 }
