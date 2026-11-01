@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Hanterar användare samt hashning av lösenord vid registrering och demoåterställning.
+ * Hanterar registrering, användaruppgifter, kontoradering och hashade lösenord vid demoåterställning.
  */
 @Service
 @RequiredArgsConstructor
