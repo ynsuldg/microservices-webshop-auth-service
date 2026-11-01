@@ -11,6 +11,7 @@ import se.iths.martin.authserverprojekt2.model.AppUser;
 import se.iths.martin.authserverprojekt2.repository.AppUserRepository;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -78,6 +79,25 @@ public class AppUserService {
         appUser.setRole("USER");
         AppUser saved = appUserRepository.save(appUser);
         return appUserMapper.toDto(saved);
+    }
+
+    /**
+     * Kontrollerar lösenordet och raderar den autentiserade användarens konto.
+     *
+     * @param username användarnamn från verifierad JWT, aldrig från formuläret
+     * @param password nuvarande lösenord som ska matcha det sparade lösenordet
+     * @throws ResponseStatusException om kontot saknas eller lösenordet är fel
+     */
+    @Transactional
+    public void deleteOwnAccount(String username, String password) {
+        var user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid account or password."));
+        if (password == null || password.isBlank() ||
+                password.getBytes(StandardCharsets.UTF_8).length > 72 ||
+                !passwordEncoder.matches(password, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid account or password.");
+        }
+        appUserRepository.delete(user);
     }
 
 }
