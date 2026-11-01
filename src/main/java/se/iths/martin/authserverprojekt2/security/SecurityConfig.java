@@ -44,6 +44,9 @@ import java.util.Base64;
 import java.util.List;
 
 
+/**
+ * Konfigurerar tjänstens autentisering, behörighetsregler och CORS.
+ */
 @Component
 @EnableWebSecurity
 public class SecurityConfig {
@@ -55,6 +58,13 @@ public class SecurityConfig {
     private final String jwtPrivateKey;
     private final String jwtKeyId;
 
+    /**
+     * Skapar SecurityConfig med de beroenden och inställningar som tjänsten behöver.
+     *
+     * @param jwtPublicKey Base64-kodad publik RSA-nyckel
+     * @param jwtPrivateKey Base64-kodad privat RSA-nyckel
+     * @param jwtKeyId identifierare för JWT-nyckeln
+     */
     public SecurityConfig(
             @Value("${app.jwt.public-key:}") String jwtPublicKey,
             @Value("${app.jwt.private-key:}") String jwtPrivateKey,
@@ -96,7 +106,7 @@ public class SecurityConfig {
     }
 
     /**
-     * Skapar en JWKSource från keyPair där rsaKey krypterar keyPair
+     * Skapar en JWKSource från keyPair där rsaKey innehåller nyckelparet för JWT-signering
      *
      * @param keyPair den publika och privata nyckeln
      * @return en immutableJWKSet som inte går att ändra efter den skapats

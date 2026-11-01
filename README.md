@@ -1,30 +1,82 @@
-### Ansvar och tekniker
+# Auth Service
 
-Auth-service ansvarar för authorization både för user och admin inom applikationen.
-Det krävs ett användarnamn och lösenord för att få en token som ger access till vårt projekt. Vi
-använder oss av jwtPublicKey och jwtPrivateKey för att skapa ett keyPair som vi sedan krypterar med
-jwtEncoder. Det ger oss en token som authentiserar inloggaren.
+## Ansvar
 
-Vi använder oss av Dto:er för att dölja känsliga uppgifter, det användaren får tillbaka är ett username
-och en role. Vi har även CRUD-metoder för en user.
+Auth Service sköter autentisering i Microservices Webshop. Användaren loggar in med användarnamn och lösenord
+och får en signerad JWT med identitet och roller. Lösenord lagras som BCrypt-hashar.
+Tjänsten tillhandahåller `/auth/login`, `/auth/me` och publika nycklar på `/auth/jwks`.
+Gatewayn använder auth-service för att verifiera kunden vid betalnings- och avbrottsanrop.
 
-### Databas, miljövariabler och port
+## Tekniker
 
-Vi använder neon databas och de miljövariabler vi har är JWT_PUBLIC_KEY, JWT_PRIVATE_KEY,
-SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD, SPRING_DATASOURCE_URL och ALLOWED_ORIGINS som
-tillåter localhost://5173. SPRING_DATASOURCE_** är miljövariabler för databasen. Auth använder port 8080.
+Java 17, Spring Boot 4, Spring Security, JWT, Maven och PostgreSQL.
 
-### Länkade repositories är följande:
+## Databas
 
-https://github.com/MartinGruter/product-service-projekt2.git
-https://github.com/MartinGruter/order-service-projekt2.git
-https://github.com/MartinGruter/email-service-projekt2.git
-https://github.com/AnwarAsry/gateway-service.git
-https://github.com/MartinGruter/micro-services.git
+PostgreSQL hos Neon lagrar användare, lösenordshashar och roller.
 
-### Starta applikation
+## Miljövariabler
 
-Applikationen startas på macOS ./mvnw spring-boot:run och med Windows mvnw.cmd spring-boot:run medan
-fronted startas med npm install och npm run dev
-När allt är igång så körs frontend på localhost://5173 där den anslutar till alla andra
-mikrotjänster och startar igång applikationen.
+| Variabel | Lokalt | Render |
+| --- | --- | --- |
+| `SPRING_DATASOURCE_URL` | Utvecklingsdatabasens JDBC-adress. | JDBC-adress som tjänsten kan nå från Render. |
+| `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | Databasens inloggning. | Databasens inloggning. |
+| `JWT_PUBLIC_KEY` | Base64-kodad RSA-nyckel i X.509-format. | Motsvarande publik nyckel för Render-miljön. |
+| `JWT_PRIVATE_KEY` | Base64-kodad RSA-nyckel i PKCS#8-format. | Matchande privat nyckel; endast auth-service ska ha den. |
+| `ALLOWED_ORIGINS` | `http://localhost:5173` | `https://microservices-webshop-frontend.onrender.com` |
+| `JWT_EXPIRATION_MINUTES` | Valfri, standard 60. | Valfri, standard 60. |
+| `JWT_KEY_ID` | Valfri, standard `jwt-key-1`. | Identifierare för nyckelparet. |
+
+Nycklarna måste höra ihop. Klistra in rena värden utan citattecken eller escape-tecken.
+Hemliga värden ska inte sparas i Git.
+
+## Starta applikationen lokalt
+
+Sätt miljövariablerna och starta från projektmappen.
+
+**macOS/Linux:**
+
+```bash
+./mvnw spring-boot:run
+```
+
+**Windows PowerShell:**
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+Kräver Java 17 eller senare och tillgång till databasen. Lokal adress: `http://localhost:8080`.
+Frontend startas i sitt repo med `npm install` och `npm run dev` och ansluter via gatewayn.
+
+## Render
+
+| Tjänst | Render-adress |
+| --- | --- |
+| Frontend – öppna webshoppen | [microservices-webshop-frontend.onrender.com](https://microservices-webshop-frontend.onrender.com) |
+| Auth Service | [microservices-webshop-auth-service.onrender.com](https://microservices-webshop-auth-service.onrender.com) |
+| Product Service | [microservices-webshop-product-service.onrender.com](https://microservices-webshop-product-service.onrender.com) |
+| Order Service | [microservices-webshop-order-service.onrender.com](https://microservices-webshop-order-service.onrender.com) |
+| Email Service | [microservices-webshop-email-service.onrender.com](https://microservices-webshop-email-service.onrender.com) |
+| Gateway Service | [microservices-webshop-gateway-service.onrender.com](https://microservices-webshop-gateway-service.onrender.com) |
+| Payment Service | [microservices-webshop-payment-service.onrender.com](https://microservices-webshop-payment-service.onrender.com) |
+- Docker-image: `ynsuldg/microservices-webshop-auth-service:1.0.0`.
+
+Använd **Web Service → Existing Image**, sätt miljövariablerna i Render och behåll Docker-imagens startkommando.
+Efter en ny image från senaste `main` väljs **Manual Deploy → Deploy latest reference**.
+En äldre Actions-omkörning kan skriva över samma tagg med äldre kod.
+
+Backendadressen är ett API, inte en vanlig webbsida. Rotadressen kan ge 401 eller 404 utan att tjänsten är nere.
+Render Free kan ge väntetid när tjänsterna väcks. Se [Render-dokumentationen](https://render.com/docs/deploying-an-image).
+
+Publika nycklar: [`/auth/jwks`](https://microservices-webshop-auth-service.onrender.com/auth/jwks).
+Product- och order-service använder denna adress som `JWT_PUBLIC_URL`.
+
+## Relaterade repositories
+
+- [Product Service](https://github.com/ynsuldg/microservices-webshop-product-service)
+- [Order Service](https://github.com/ynsuldg/microservices-webshop-order-service)
+- [Email Service](https://github.com/ynsuldg/microservices-webshop-email-service)
+- [Gateway Service](https://github.com/ynsuldg/microservices-webshop-gateway-service)
+- [Payment Service](https://github.com/ynsuldg/microservices-webshop-payment-service)
+- [Frontend](https://github.com/ynsuldg/microservices-webshop-frontend)

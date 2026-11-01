@@ -7,12 +7,15 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Konfigurerar API-dokumentation och JWT Bearer-autentisering i Swagger.
+ */
 @Configuration
 public class SwaggerConfig {
     /**
      * Tillåter authentication med token för auth-service. Swagger-configuration.
      *
-     * @return
+     * @return OpenAPI-konfiguration med JWT Bearer-autentisering
      */
     @Bean
     public OpenAPI customOpenAPI() {

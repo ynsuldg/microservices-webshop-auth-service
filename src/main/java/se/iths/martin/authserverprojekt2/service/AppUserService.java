@@ -12,6 +12,9 @@ import se.iths.martin.authserverprojekt2.repository.AppUserRepository;
 
 import java.util.List;
 
+/**
+ * Hanterar användare och hashning av lösenord vid registrering.
+ */
 @Service
 @RequiredArgsConstructor
 public class AppUserService {

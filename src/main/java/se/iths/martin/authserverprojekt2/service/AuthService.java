@@ -23,6 +23,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Autentiserar användare och skapar signerade JWT med användarens roller.
+ */
 @Service
 public class AuthService {
     private final AuthenticationManager authenticationManager;
@@ -31,6 +34,15 @@ public class AuthService {
     private final long jwtExpirationMinutes;
     private final String jwtKeyId;
 
+    /**
+     * Skapar AuthService med de beroenden och inställningar som tjänsten behöver.
+     *
+     * @param authenticationManager hanterar autentisering av användarnamn och lösenord
+     * @param jwtEncoder signerar JWT
+     * @param keyPair RSA-nyckelpar för JWT
+     * @param jwtExpirationMinutes JWT:ns giltighetstid i minuter
+     * @param jwtKeyId identifierare för JWT-nyckeln
+     */
     public AuthService(AuthenticationManager authenticationManager,
                        JwtEncoder jwtEncoder,
                        KeyPair keyPair,

@@ -14,6 +14,9 @@ import se.iths.martin.authserverprojekt2.service.AuthService;
 
 import java.util.Map;
 
+/**
+ * Exponerar inloggning, publik JWT-nyckel och den autentiserade användarens uppgifter.
+ */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor

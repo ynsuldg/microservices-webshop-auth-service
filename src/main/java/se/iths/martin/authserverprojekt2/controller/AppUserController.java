@@ -9,6 +9,9 @@ import se.iths.martin.authserverprojekt2.service.AppUserService;
 
 import java.util.List;
 
+/**
+ * Exponerar API-anrop för att skapa och hämta användare.
+ */
 @RestController
 @RequestMapping("/appusers")
 @RequiredArgsConstructor
@@ -40,7 +43,7 @@ public class AppUserController {
      * Skapar en användare
      *
      * @param appUserRequestDto Kräver username och password
-     * @return En skapad användare med username och password
+     * @return Den skapade användarens id och användarnamn, utan lösenord
      */
     @Valid
     @PostMapping
