@@ -7,7 +7,19 @@ och får en signerad JWT med identitet och roller. Lösenord lagras som BCrypt-h
 Tjänsten tillhandahåller `/auth/login`, `/auth/me` och publika nycklar på `/auth/jwks`.
 Gatewayn använder auth-service för att verifiera kunden vid betalnings- och avbrottsanrop.
 
-Demoåterställningen av lösenord använder endast e-postadress och nytt lösenord, utan ägarverifiering. Den är avsedd för testkonton och ska inte användas i produktion.
+## Kontohantering
+
+| Anrop | Funktion |
+| --- | --- |
+| `POST /appusers` | Registrerar ett konto med e-postadress och lösenord. Rollen sätts alltid till USER. |
+| `POST /appusers/password-reset` | Sparar ett nytt hashat lösenord för en befintlig e-postadress. |
+| `DELETE /appusers/me` | Raderar kontot från verifierad JWT efter kontroll av nuvarande lösenord. |
+
+Nya lösenord kräver minst åtta tecken och högst 72 UTF-8-byte. Lösenord returneras aldrig i API-svaren.
+Frontend anropar dessa funktioner via gatewayn. Efter registrering och återställning loggar användaren in på nytt.
+
+Demoåterställningen saknar ägarverifiering: den som känner till e-postadressen kan byta lösenordet.
+Den är avsedd för testkonton och ska inte användas i produktion.
 
 ## Tekniker
 

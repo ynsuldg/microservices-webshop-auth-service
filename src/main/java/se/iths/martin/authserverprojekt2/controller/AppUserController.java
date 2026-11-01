@@ -51,7 +51,7 @@ public class AppUserController {
      * Registrerar ett konto med validerad e-postadress och lösenord.
      *
      * @param request uppgifter för det nya kontot
-     * @return Den skapade användarens id och användarnamn, utan lösenord
+     * @return HTTP 201 med användarens id och användarnamn, utan lösenord
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -65,6 +65,7 @@ public class AppUserController {
      *
      * @param request e-postadress och nytt lösenord
      * @return HTTP 204 när det nya lösenordet har sparats
+     * @throws org.springframework.web.server.ResponseStatusException om kontot saknas eller lösenordet är ogiltigt
      */
     @PostMapping("/password-reset")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody PasswordResetRequestDto request) {
@@ -78,6 +79,7 @@ public class AppUserController {
      * @param jwt verifierad token med användarnamnet som subject
      * @param request nuvarande lösenord för att bekräfta raderingen
      * @return HTTP 204 när kontot har raderats
+     * @throws org.springframework.web.server.ResponseStatusException om kontot saknas eller lösenordet är fel
      */
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteOwnAccount(@AuthenticationPrincipal Jwt jwt,

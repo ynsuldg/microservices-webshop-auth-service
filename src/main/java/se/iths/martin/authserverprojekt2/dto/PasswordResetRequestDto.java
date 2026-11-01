@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
  * Validerar den förenklade demoåterställningen utan mejl eller identitetskontroll.
  *
  * @param username kontots e-postadress
- * @param newPassword nytt lösenord med minst åtta tecken
+ * @param newPassword nytt lösenord med minst åtta tecken, högst 72 UTF-8-byte efter servicevalidering
  */
 public record PasswordResetRequestDto(
         @NotBlank @Email String username,
