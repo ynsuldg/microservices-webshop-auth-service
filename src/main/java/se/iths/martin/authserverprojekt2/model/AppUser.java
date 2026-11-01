@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Lagrar användarens identitet, hashade lösenord och roll.
+ */
 @Entity
 @Getter
 @Setter
